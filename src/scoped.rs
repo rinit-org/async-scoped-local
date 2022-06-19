@@ -2,9 +2,9 @@ use std::marker::PhantomData;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
+use futures::future::{AbortHandle, Abortable};
 use futures::stream::FuturesUnordered;
 use futures::{Future, Stream};
-use futures::future::{AbortHandle, Abortable};
 
 use pin_project::*;
 
@@ -53,7 +53,7 @@ impl<'a, T: Send + 'static, Sp: Spawner<T> + Blocker> Scope<'a, T, Sp> {
     /// Spawn a future with `async_std::task::spawn`. The
     /// future is expected to be driven to completion before
     /// 'a expires.
-    pub fn spawn<F: Future<Output = T> + Send + 'a>(&mut self, f: F) {
+    pub fn spawn<F: Future<Output = T> + 'a>(&mut self, f: F) {
         let handle = Sp::spawn(unsafe {
             std::mem::transmute::<_, Pin<Box<dyn Future<Output = T> + Send>>>(
                 Box::pin(f) as Pin<Box<dyn Future<Output = T>>>
@@ -70,7 +70,7 @@ impl<'a, T: Send + 'static, Sp: Spawner<T> + Blocker> Scope<'a, T, Sp> {
     /// pre-maturely. It can also be cancelled by explicitly
     /// calling (and awaiting) the `cancel` method.
     #[inline]
-    pub fn spawn_cancellable<F: Future<Output = T> + Send + 'a, Fu: FnOnce() -> T + Send + 'a>(
+    pub fn spawn_cancellable<F: Future<Output = T> + 'a, Fu: FnOnce() -> T + Send + 'a>(
         &mut self,
         f: F,
         default: Fu,

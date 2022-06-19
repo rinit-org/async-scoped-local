@@ -2,8 +2,8 @@ use futures::Future;
 
 pub trait Spawner<T> {
     type FutureOutput;
-    type SpawnHandle: Future<Output=Self::FutureOutput> + Send;
-    fn spawn<F: Future<Output=T> + Send + 'static>(f: F) -> Self::SpawnHandle;
+    type SpawnHandle: Future<Output = Self::FutureOutput>;
+    fn spawn<F: Future<Output = T> + 'static>(f: F) -> Self::SpawnHandle;
 }
 
 pub trait Blocker {
@@ -43,8 +43,8 @@ cfg_tokio! {
             type FutureOutput = Result<T, tokio_task::JoinError>;
             type SpawnHandle = tokio_task::JoinHandle<T>;
 
-            fn spawn<F: Future<Output=T> + Send + 'static>(f: F) -> Self::SpawnHandle {
-                tokio_task::spawn(f)
+            fn spawn<F: Future<Output=T> + 'static>(f: F) -> Self::SpawnHandle {
+                tokio_task::spawn_local(f)
             }
         }
         impl Blocker for Tokio {

@@ -1,6 +1,6 @@
 # Async-scoped
 
-Enables controlled spawning of non-`'static` futures when
+Enables controlled spawning of non-`'static` and local futures when
 using the [async-std](//github.com/async-rs/async-std) or
 [tokio](//github.com/tokio-rs/tokio) executors.
 
